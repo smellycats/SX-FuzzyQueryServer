@@ -8,8 +8,9 @@ from passlib.hash import sha256_crypt
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from fuzzy_query import db, app, api, auth, limiter, cache, logger, access_logger
-from models import Users, Scope, Hphm7, Hphm12, Clxx
+from models import Users, Scope, GDHphm7, Hphm7, Hphm12, Clxx
 #from help_func import *
+import helper
 
 
 def verify_addr(f):
@@ -346,7 +347,62 @@ class ClxxList(Resource):
             logger.error(e)
             raise
 
+def hphm_select(h, p, segment):
+    if p == 1:
+        return h.filter_by(p1=segment)
+    elif p == 2:
+        return h.filter_by(p2=segment)
+    elif p == 3:
+        return h.filter_by(p3=segment)
+    elif p == 4:
+        return h.filter_by(p4=segment)
+    elif p == 5:
+        return h.filter_by(p5=segment)
 
+class FuzzyQuery(Resource):
+    decorators = [limiter.exempt]
+
+    @verify_addr
+    #@verify_token
+    def post(self):
+        try:
+            #print request.json['hphm']
+            query_dict = helper.bulit_hphm(request.json['hphm'])
+            print query_dict
+            h7_dict = {1: Hphm7.p1, 2: Hphm7.p2, 3: Hphm7.p3, 4: Hphm7.p4,
+                       5: Hphm7.p5}
+            gd_h7_dict = {1: GDHphm7.p1, 2: GDHphm7.p2, 3: GDHphm7.p3,
+                          4: GDHphm7.p4, 5: GDHphm7.p5}
+            if query_dict:
+                g_h7 = db.session.query(GDHphm7.hphm).join(Clxx, GDHphm7.hphm == Clxx.hphm).filter(GDHphm7.hphm.like(request.json['hphm']))
+                h7 = db.session.query(Hphm7.hphm).join(Clxx, Hphm7.hphm == Clxx.hphm).filter(Hphm7.hphm.like(request.json['hphm']))
+                if not query_dict['f']:
+                    g_h7 = g_h7.filter(gd_h7_dict[query_dict['p']] == query_dict['h'])
+                    h7 = h7.filter(h7_dict[query_dict['p']] == query_dict['h'])
+                else:
+                    print 'test'
+                    g_h7_query = (gd_h7_dict[query_dict['p']] == query_dict['h'])
+                    h7_query = (h7_dict[query_dict['p']] == query_dict['h'])
+                    for i in range(1, 7-query_dict['l']+1):
+                        g_h7_query = g_h7_query | (gd_h7_dict[query_dict['p']+1] == query_dict['h'])
+                        h7_query = h7_query | (h7_dict[query_dict['p']+1] == query_dict['h'])
+                    g_h7 = g_h7.filter(g_h7_query)
+                    h7 = h7.filter(h7_query)
+            g_h7 = g_h7.filter(Clxx.date == request.json['hphm'])
+            h7 = h7.filter(Clxx.date == request.json['hphm'])
+            h12 =db.session.query(Hphm12.hphm).join(Clxx, Hphm12.hphm == Clxx.hphm).filter(Hphm12.hphm.like(request.json['hphm'])).filter(Clxx.date == request.json['hphm'])
+            union_hphm = g_h7.union_all(h7).union_all(h12)
+            #print h7
+            #print g_h7
+            print union_hphm
+            r = union_hphm.all()
+            #print fuzzy_hphm
+            #r = fuzzy_hphm.all()
+            print r
+            print len(r)
+        except Exception as e:
+            print (e)
+    
 api.add_resource(Index, '/')
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(UserList, '/user')
@@ -356,5 +412,7 @@ api.add_resource(HphmApi, '/hphm/<string:hphm>')
 api.add_resource(HphmList, '/hphm')
 api.add_resource(ClxxApi, '/clxx/<string:date>')
 api.add_resource(ClxxList, '/clxx')
+api.add_resource(FuzzyQuery, '/fuzzy')
+
 
 

@@ -3,6 +3,7 @@ import arrow
 
 from fuzzy_query import db
 from fuzzy_query.models import Users, Hphm7, Hphm12, Clxx
+from sqlalchemy import or_, not_
 
 def test_scope_get():
     scope = Scope.query.all()
@@ -45,7 +46,47 @@ def test_clxx_add():
     db.session.commit()
     print clxx.id
 
+def test_union():
+    h1 = db.session.query(Hphm7.hphm).filter_by(p3='23')
+    h2 = db.session.query(Hphm12.hphm).filter_by(hphm=u'粤L12345')
+    
+    q = h1.union_all(h2).all()
+    print len(q)
 
+def test_or_filter():
+    h7_dict = {3: Hphm7.p3}
+    #tu = (h7_dict[3]=='23',Hphm7.p4=='23')
+    #help(or_)
+    a = (Hphm7.p3=='23')
+    a = a | (Hphm7.p4=='23')
+    a = a | (Hphm7.p5=='23')
+    #print type(a)
+    #print a
+    #h1 = db.session.query(Hphm7.hphm).filter(or_(h7_dict[3]=='23',Hphm7.p4=='23'))
+    h1 = db.session.query(Hphm7.hphm).filter(Hphm7.hphm.like('粤L123%'))
+    h1 = h1.filter(a)
+    h2 = db.session.query(Hphm12.hphm).filter(Hphm12.hphm.like('粤L123%'))
+    #h1 = db.session.query(Hphm7.hphm).filter(or_(Hphm7.p3=='23'))
+    #h1 = h1.filter(or_(Hphm7.p4=='23'))
+    h3 = h1.union_all(h2)
+    print h3
+    q = h3.join(Clxx, anon_1.hphm7_hphm == Clxx.hphm)
+    #print q
+    q = q.all()
+    print q
+
+def test_get_hphms():
+    h = Hphm7.query.limit(10000).all()
+    for i in h:
+        c = Clxx(date='2015-09-28', hphm=i.hphm)
+        db.session.add(c)
+        db.session.commit()
+    print 'done'
+
+def test_join():
+    h1 = db.session.query(Hphm7.hphm).join(Clxx, Hphm7.hphm == Clxx.hphm).filter(Hphm7.hphm.like('粤L123%')).filter(Clxx.date>='2015-09-28')
+    print h1
+    print h1.all()
 if __name__ == '__main__':
     #hpys_test()
     #hbc_add()
@@ -54,6 +95,10 @@ if __name__ == '__main__':
     #test_hphm12_add()
     #test_hphm12_get()
     #test_clxx_add()
-    test_clxx_get()
+    #test_clxx_get()
+    #test_union()
+    #test_or_filter()
+    #test_get_hphms()
+    test_join()
 
 

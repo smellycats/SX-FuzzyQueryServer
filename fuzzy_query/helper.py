@@ -4,16 +4,17 @@
 def decompose_hphm(hphm):
     if hphm == '' or hphm == '-':
         return None
-    p_list = []
+    hphm_segment_list = []
     fix_hphm = '%s_' % hphm
     for i in range(len(hphm)):
-        p_list.append(fix_hphm[i:i+2])
-    return p_list
+        hphm_segment_list.append(fix_hphm[i:i+2])
+    return hphm_segment_list
 
 def bulit_hphm(hphm):
     hphm_list = hphm.split('%')
     hphm_segment_list = []
     hphm_len = 0
+    print hphm_list
     if len(hphm_list) == 1:
         seg = find_hphm_segment(hphm_list[0])
         if seg:
@@ -55,8 +56,8 @@ def bulit_hphm(hphm):
                     p = 0
                     for j in range(0, i):
                         p += len(hphm_list[j])
-                    return {'h': seg['segment'], 'f': False, 'l': hphm_len,
-                            'p': p + seg['pos'] + i}
+                    return {'h': seg['segment'], 'f': True, 'l': hphm_len,
+                            'p': p + seg['pos']}
     return None
             
             

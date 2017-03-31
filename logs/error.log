@@ -1,0 +1,10 @@
+2015-09-24 17:48:47 views.py[line:262]         [ERROR] cannot convert dictionary update sequence element #0 to a sequence
+2015-09-24 17:52:13 views.py[line:264]         [ERROR] cannot convert dictionary update sequence element #0 to a sequence
+2015-09-24 17:52:40 views.py[line:264]         [ERROR] cannot convert dictionary update sequence element #0 to a sequence
+2015-09-24 17:54:29 views.py[line:264]         [ERROR] 'BaseQuery' object has no attribute 'id'
+2015-09-24 18:11:45 views.py[line:265]         [ERROR] 'NoneType' object has no attribute 'id'
+2015-09-24 18:12:17 views.py[line:264]         [ERROR] 'NoneType' object has no attribute 'id'
+2015-09-24 20:59:03 views.py[line:295]         [ERROR] global name 'hphp' is not defined
+2015-09-24 20:59:28 views.py[line:295]         [ERROR] (_mysql_exceptions.IntegrityError) (1062, "Duplicate entry '\xe7\xb2\xa4L54321' for key 'idx_p0'") [SQL: u'INSERT INTO hphm7 (hphm, p1, p2, p3, p4, p5, p6) VALUES (%s, %s, %s, %s, %s, %s, %s)'] [parameters: ('\xe7\xb2\xa4L54321', 'L5', '54', '43', '32', '21', '1_')]
+2015-09-24 20:59:38 views.py[line:295]         [ERROR] global name 'hphp' is not defined
+2015-09-28 03:33:59 views.py[line:324]         [ERROR] global name 'date' is not defined

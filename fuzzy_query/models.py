@@ -69,6 +69,31 @@ class Hphm7(db.Model):
         return '<Hphm7 %r>' % self.hphm
 
 
+class GDHphm7(db.Model):
+    """7位车牌号码"""
+    __tablename__ = 'gd_hphm7'
+    id = db.Column(db.Integer, primary_key=True)
+    hphm = db.Column(db.String(7), default='-')
+    p1 = db.Column(db.String(2), default='__')
+    p2 = db.Column(db.String(2), default='__')
+    p3 = db.Column(db.String(2), default='__')
+    p4 = db.Column(db.String(2), default='__')
+    p5 = db.Column(db.String(2), default='__')
+    p6 = db.Column(db.String(2), default='__')
+
+    def __init__(self, hphm, p1='__', p2='__', p3='__', p4='__', p5='__', p6='__'):
+        self.hphm = hphm
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
+        self.p5 = p5
+        self.p6 = p6
+
+    def __repr__(self):
+        return '<GDHphm7 %r>' % self.hphm
+
+
 class Hphm12(db.Model):
     """不等于7位车牌号码"""
     __tablename__ = 'hphm12'
